@@ -1,13 +1,29 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-void main() {
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    IO.println(String.format("Hello and welcome!"));
+import me.code.commands.CreateTransactionCommand;
+import me.code.commands.DeleteTransactionCommand;
+import me.code.commands.ListTransactionsCommand;
+import me.code.commands.ShowBalanceCommand;
+import me.code.repositories.FileTransactionRepository;
+import me.code.services.DefaultTransactionService;
+import me.code.services.ICommandService;
+import me.code.services.ITransactionService;
+import me.code.services.TerminalCommandService;
 
-    for (int i = 1; i <= 5; i++) {
-        //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-        // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        IO.println("i = " + i);
+
+void main() {
+
+    ICommandService commandService = new TerminalCommandService();
+    ITransactionService transactionService = new DefaultTransactionService(
+            new FileTransactionRepository()
+    );
+
+
+    commandService.registerCommand(new CreateTransactionCommand(transactionService));
+    commandService.registerCommand(new DeleteTransactionCommand(transactionService));
+    commandService.registerCommand(new ListTransactionsCommand(transactionService));
+    commandService.registerCommand(new ShowBalanceCommand(transactionService));
+
+    if (commandService instanceof TerminalCommandService service) {
+        service.start();
     }
 }
+
